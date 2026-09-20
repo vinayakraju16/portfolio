@@ -1,188 +1,203 @@
 import './App.css';
-import { motion } from 'framer-motion';
-import { Carousel } from 'react-responsive-carousel';
-import 'react-responsive-carousel/lib/styles/carousel.min.css';
-import { FaLinkedin, FaGithub, FaEnvelope, FaPython, FaJs, FaJava, FaDatabase, FaAws, FaDocker, FaReact, FaNodeJs } from 'react-icons/fa';
-import hackathonImg from './assets/hackthon image.avif';
-import { useState } from 'react';
+import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import {
+  FaArrowRight, FaAws, FaCode, FaDatabase, FaDocker, FaDownload,
+  FaEnvelope, FaExternalLinkAlt, FaGithub, FaGraduationCap, FaLinkedin,
+  FaMapMarkerAlt, FaPhoneAlt, FaReact, FaServer,
+} from 'react-icons/fa';
+import { SiPytorch } from 'react-icons/si';
+import profileImg from './assets/Vinayak-normal-v2.jpg';
 
-const projectImages = [
-  'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80',
-  'https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80',
+const projects = [
+  {
+    number: '01', eyebrow: 'Full-stack machine learning', featured: true,
+    title: 'Seattle House Price Prediction',
+    summary: 'Built a production-oriented valuation platform that turns official King County property data into explainable home-price estimates.',
+    result: '0.832 R²', resultLabel: 'on an untouched temporal holdout',
+    details: [
+      'Prepared 83,593 validated sales and engineered 18 model inputs from assessor extracts.',
+      'Served a tuned HistGradientBoosting pipeline through a Django API and React dashboard.',
+      'Added calibrated ranges, feature contributions, model versioning, monitoring, Docker and CI.',
+    ],
+    stack: ['React', 'Django', 'Scikit-learn', 'PostgreSQL', 'Docker'],
+    repo: 'https://github.com/vinayakraju16/House-Price-Prediction',
+  },
+  {
+    number: '02', eyebrow: 'MS thesis research', featured: true,
+    title: 'Adversarial Robustness of NLP Models',
+    summary: 'Evaluated how temporal relation classifiers behave under real-world adversarial language attacks.',
+    result: '86% → 12%', resultLabel: 'accuracy under PWWS attack',
+    details: [
+      'Fine-tuned BERT and RoBERTa on the TLINK temporal relation dataset.',
+      'Benchmarked 15 attacks, including TextFooler, PWWS, BAE and BERT-Attack.',
+      'Built a YAML-driven, GPU-accelerated evaluation pipeline with automated result logging.',
+    ],
+    stack: ['Python', 'PyTorch', 'Hugging Face', 'TextAttack'],
+  },
+  {
+    number: '03', eyebrow: 'Machine learning system',
+    title: 'Credit Card Fraud Detection',
+    summary: 'Built an end-to-end fraud classification workflow with an API and real-time prediction dashboard.',
+    result: '16%', resultLabel: 'fewer false positives',
+    details: [
+      'Developed a logistic regression pipeline and exposed predictions through a Flask REST API.',
+      'Used feature engineering and hyperparameter tuning to reduce false positives.',
+      'Improved model efficiency by 23% with ensemble and under-sampling techniques.',
+    ],
+    stack: ['Python', 'Scikit-learn', 'Flask', 'REST API'],
+  },
+  {
+    number: '04', eyebrow: 'Predictive analytics',
+    title: 'Early Heart Disease Prediction',
+    summary: 'Created a patient risk-classification workflow with encrypted data handling and analytical dashboards.',
+    result: '26%', resultLabel: 'improved detection outcomes',
+    details: [
+      'Built and evaluated a predictive model for early risk-factor classification.',
+      'Implemented encrypted data pipelines with privacy-conscious handling practices.',
+      'Presented model findings through Matplotlib and Tableau dashboards.',
+    ],
+    stack: ['Python', 'Scikit-learn', 'Matplotlib', 'Tableau'],
+  },
 ];
 
-const skills = [
-  { name: 'Python', icon: <FaPython />, level: 90 },
-  { name: 'JavaScript', icon: <FaJs />, level: 85 },
-  { name: 'Java', icon: <FaJava />, level: 80 },
-  { name: 'React.js', icon: <FaReact />, level: 85 },
-  { name: 'Node.js', icon: <FaNodeJs />, level: 80 },
-  { name: 'SQL/Databases', icon: <FaDatabase />, level: 75 },
-  { name: 'AWS', icon: <FaAws />, level: 70 },
-  { name: 'Docker', icon: <FaDocker />, level: 70 },
+const capabilities = [
+  { icon: <FaCode />, title: 'Languages', items: ['Python', 'JavaScript'] },
+  { icon: <FaReact />, title: 'Full-stack', items: ['React.js', 'Node.js', 'Express.js', 'REST APIs'] },
+  { icon: <SiPytorch />, title: 'AI & machine learning', items: ['PyTorch', 'TensorFlow', 'Scikit-learn', 'Hugging Face'] },
+  { icon: <FaServer />, title: 'Cloud & data', items: ['AWS', 'Docker', 'MySQL', 'PostgreSQL', 'MongoDB'] },
 ];
 
-const sections = [
-  { id: 'about', label: 'About' },
-  { id: 'skills', label: 'Skills' },
-  { id: 'experience', label: 'Experience' },
-  { id: 'projects', label: 'Projects' },
-  { id: 'education', label: 'Education' },
-  { id: 'leadership', label: 'Leadership & Activities' },
-  { id: 'achievements', label: 'Achievements' },
-  { id: 'contact', label: 'Contact' },
-];
+const reveal = { hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } };
 
-function scrollToSection(id) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-}
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.7 } },
-};
-
-export default function App() {
-  const [showModal, setShowModal] = useState(false);
-  const profileImg = 'https://randomuser.me/api/portraits/men/32.jpg'; // Placeholder profile image
+function App() {
   return (
-    <div className="portfolio-root">
-      {/* Hero Section */}
-      <motion.header className="portfolio-header hero" initial={{ opacity: 0, y: -40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-        <div className="hero-content">
-          <img src={profileImg} alt="Profile" className="profile-img" />
-          <div>
-            <h1>
-              <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 1 }}>
-                Siddhivinayak Raghavraju
-              </motion.span>
-            </h1>
-            <motion.p className="animated-intro" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 1 }}>
-              Full Stack Developer | AI/ML Enthusiast
-            </motion.p>
-            <div className="hero-links">
-              <a href="mailto:vinayakraju01@gmail.com" title="Email"><FaEnvelope /></a>
-              <a href="https://www.linkedin.com/in/vinayak-raju/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><FaLinkedin /></a>
-              <a href="https://github.com/vinayakraju16" target="_blank" rel="noopener noreferrer" title="GitHub"><FaGithub /></a>
-            </div>
-          </div>
-        </div>
-        <nav className="portfolio-nav">
-          {sections.map((s) => (
-            <button key={s.id} onClick={() => scrollToSection(s.id)}>{s.label}</button>
-          ))}
+    <div className="site-shell">
+      <motion.header className="site-header" initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.55 }}>
+        <a className="brand" href="#top" aria-label="Siddhivinayak Raghavraju, home">SR<span>.</span></a>
+        <nav aria-label="Primary navigation">
+          <a href="#work">Work</a><a href="#experience">Experience</a><a href="#about">About</a>
         </nav>
+        <a className="header-cta" href="mailto:rajuvinayak06@gmail.com">Let&apos;s talk <FaArrowRight aria-hidden="true" /></a>
       </motion.header>
-      <main>
-        <motion.section id="about" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>About</h2>
-          <p>Full Stack Developer with 1.9 years of experience in designing and building scalable web applications, combined with a strong foundation in Artificial Intelligence and Machine Learning. Skilled in Python, Java, JavaScript, React, Node.js, TensorFlow, and AWS. Passionate about developing innovative solutions by blending software engineering and AI expertise. Seeking opportunities in AI/ML or software development to contribute to impactful projects.</p>
-        </motion.section>
-        <motion.section id="skills" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Technical Skills</h2>
-          <div className="skills-list">
-            {skills.map((skill) => (
-              <div className="skill-bar" key={skill.name}>
-                <div className="skill-label">{skill.icon} {skill.name}</div>
-                <div className="bar-bg">
-                  <motion.div className="bar-fill" initial={{ width: 0 }} whileInView={{ width: skill.level + '%' }} transition={{ duration: 1.2 }} viewport={{ once: true }} />
-                </div>
-                <span className="skill-level">{skill.level}%</span>
+
+      <main id="top">
+        <section className="hero section-wrap" aria-labelledby="hero-title">
+          <motion.div className="hero-copy" initial="hidden" animate="visible" variants={reveal} transition={{ duration: 0.65 }}>
+            <p className="availability"><span /> Open to full-time opportunities</p>
+            <p className="hero-introduction">Hi, I&apos;m Siddhivinayak Raghavraju.</p>
+            <h1 id="hero-title">Full-stack developer and <em>AI engineer.</em></h1>
+            <p className="hero-summary">I build reliable web applications and practical machine-learning systems. My experience spans React, Node.js, AWS and graduate research in adversarial NLP.</p>
+            <div className="hero-actions">
+              <a className="button button-primary" href="#work">Explore my work <FaArrowRight aria-hidden="true" /></a>
+              <a className="button button-secondary" href="/Siddhivinayak-Raghavraju-Resume.pdf" download><FaDownload aria-hidden="true" /> Download résumé</a>
+            </div>
+            <div className="hero-meta">
+              <span><FaMapMarkerAlt aria-hidden="true" /> Denton, Texas</span>
+              <span>MS in Artificial Intelligence · UNT</span>
+            </div>
+          </motion.div>
+
+          <motion.aside className="profile-card" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.65, delay: 0.15 }} aria-label="Profile summary">
+            <div className="profile-image-wrap">
+              <img src={profileImg} alt="Siddhivinayak Raghavraju" className="profile-image" />
+              <div className="profile-scrim" aria-hidden="true" />
+              <div className="profile-badge"><span /> Available for opportunities</div>
+            </div>
+            <div className="profile-content">
+              <p className="eyebrow">Applied AI × Software Engineering</p>
+              <h2>Siddhivinayak Raghavraju</h2>
+              <p>Full Stack Developer &amp; AI/ML Engineer</p>
+              <div className="social-links">
+                <a href="https://www.linkedin.com/in/vinayak-raju/" target="_blank" rel="noreferrer" aria-label="LinkedIn profile"><FaLinkedin /></a>
+                <a href="https://github.com/vinayakraju16" target="_blank" rel="noreferrer" aria-label="GitHub profile"><FaGithub /></a>
+                <a href="mailto:rajuvinayak06@gmail.com" aria-label="Send email"><FaEnvelope /></a>
               </div>
+            </div>
+          </motion.aside>
+        </section>
+
+        <motion.section className="proof-strip" aria-label="Career highlights" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }} variants={reveal} transition={{ duration: 0.55 }}>
+          <div><strong>~2 yrs</strong><span>professional experience</span></div>
+          <div><strong>15</strong><span>NLP attacks evaluated</span></div>
+          <div><strong>15%</strong><span>workflow productivity gain</span></div>
+          <div><strong>Thousands</strong><span>concurrent IPTV users served</span></div>
+        </motion.section>
+
+        <section className="section-wrap section-block" id="work">
+          <div className="section-heading">
+            <div><p className="eyebrow">Selected work</p><h2>Projects with measurable outcomes.</h2></div>
+            <a className="text-link" href="https://github.com/vinayakraju16" target="_blank" rel="noreferrer">View GitHub <FaExternalLinkAlt aria-hidden="true" /></a>
+          </div>
+          <div className="projects-grid">
+            {projects.map((project, index) => (
+              <motion.article className={`project-card ${project.featured ? 'project-featured' : ''}`} key={project.title} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={reveal} transition={{ duration: 0.5, delay: index * 0.06 }}>
+                <div className="project-topline"><span>{project.number}</span><p>{project.eyebrow}</p></div>
+                <div className="project-layout">
+                  <div className="project-copy">
+                    <h3>{project.title}</h3><p className="project-summary">{project.summary}</p>
+                    <ul>{project.details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
+                  </div>
+                  <div className="project-result"><strong>{project.result}</strong><span>{project.resultLabel}</span></div>
+                </div>
+                <div className="project-footer">
+                  <div className="tag-list" aria-label={`${project.title} technologies`}>{project.stack.map((item) => <span key={item}>{item}</span>)}</div>
+                  {project.repo && <a className="project-link" href={project.repo} target="_blank" rel="noreferrer"><FaGithub aria-hidden="true" /> View repository <FaExternalLinkAlt aria-hidden="true" /></a>}
+                </div>
+              </motion.article>
             ))}
           </div>
-        </motion.section>
-        <motion.section id="experience" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Professional Experience</h2>
-          <h3>Full Stack Software Developer, Infynect Labs PVT LTD <span className="date">Dec 2022 - Aug 2024</span></h3>
-          <ul>
-            <li>Developed and maintained end-to-end web applications using React.js, Node.js, and MySQL, enhancing application performance and user experience.</li>
-            <li>Implemented automation solutions and optimized workflows, increasing productivity by 15%.</li>
-            <li>Worked on IPTV systems and integrated Digital Rights Management (DRM) solutions to ensure secure content delivery.</li>
-            <li>Collaborated with cross-functional teams to deliver software aligned with business goals.</li>
-            <li>Containerized applications with Docker and deployed on AWS, improving deployment efficiency.</li>
-          </ul>
-        </motion.section>
-        <motion.section id="projects" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Projects</h2>
-          <Carousel showThumbs={false} infiniteLoop autoPlay interval={4000} className="project-carousel">
-            <div>
-              <img src={projectImages[0]} alt="Cryptocurrency Prediction" />
-              <div className="legend">
-                <h3>Cryptocurrency Prediction</h3>
-                <ul>
-                  <li>Developed and fine-tuned a logistic regression-based machine learning model achieving an 87% accuracy rate in predicting credit card fraud.</li>
-                  <li>Minimized false positives by 16% through rigorous feature engineering and hyperparameter tuning processes.</li>
-                  <li>Implemented under-sampling and ensemble techniques to address class imbalance, leading to 15% improved performance.</li>
-                  <li>Successfully mitigated fraudulent transactions while optimizing model efficiency by 23% and accuracy by 6%.</li>
-                  <li>Integrated REST API endpoints for model predictions and created a simple dashboard using Flask for real-time insights.</li>
-                </ul>
+        </section>
+
+        <section className="section-wrap section-block" id="experience">
+          <div className="section-heading"><div><p className="eyebrow">Professional experience</p><h2>Engineering from interface to infrastructure.</h2></div></div>
+          <motion.article className="experience-card" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={reveal} transition={{ duration: 0.55 }}>
+            <div className="experience-sidebar"><p className="experience-date">Dec 2022 — Aug 2024</p><p>Bengaluru, India</p></div>
+            <div className="experience-main">
+              <p className="eyebrow">Infynect Labs Private Limited</p><h3>Full Stack Software Developer</h3>
+              <p className="experience-intro">Built and operated features for a live IPTV streaming platform serving thousands of concurrent users.</p>
+              <div className="impact-grid">
+                <div><FaReact /><p>Developed end-to-end applications with React, Node.js and MySQL.</p></div>
+                <div><FaDatabase /><p>Integrated DRM workflows for secure, licensed content delivery.</p></div>
+                <div><FaDocker /><p>Containerized microservices and deployed them on AWS.</p></div>
+                <div><FaAws /><p>Automated workflows, increasing team productivity by 15%.</p></div>
               </div>
             </div>
-            <div>
-              <img src={projectImages[1]} alt="Early Heart Disease Prediction" />
-              <div className="legend">
-                <h3>Early Heart Disease Prediction</h3>
-                <ul>
-                  <li>Spearheaded the implementation of HIPAA-compliant data encryption protocols across all healthcare solutions, decreasing data breach incidents by 40% and ensuring patient privacy and security.</li>
-                  <li>Demonstrated commitment to ethical data practices while contributing to the development of data-driven healthcare solutions.</li>
-                  <li>Enhanced healthcare outcomes by 26% through accurate prediction of heart disease, positively impacting patient well-being.</li>
-                  <li>Designed data pipelines for preprocessing patient data and visualizing prediction results using Matplotlib and Tableau.</li>
-                </ul>
-              </div>
-            </div>
-          </Carousel>
-        </motion.section>
-        <motion.section id="education" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Education</h2>
-          <ul>
-            <li><b>Master of Science in Artificial Intelligence</b><br/>University Of North Texas, Denton TX USA<br/>Expected Graduation: May 2026</li>
-            <li><b>Bachelor of Technology in Computer Science</b><br/>SVPCET Puttur, Andhra Pradesh, India<br/>Graduated: May 2021</li>
-          </ul>
-        </motion.section>
-        <motion.section id="leadership" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Leadership & Activities</h2>
-          <ul>
-            <li>Coordinated and facilitated an Interstate Robotics Workshop, enhancing collaboration and technical skills among participants.</li>
-            <li>Volunteered in planning and organizing FEASTA, a major cultural and technical fest, contributing to team management and event success.</li>
-            <li>Completed a Personality Development Program by AP Skill Development, strengthening communication and professional skills.</li>
-            <li>Participated in a Web Development Coding Competition, applying creative problem-solving to build innovative solutions.</li>
-            <li>Recognized as one of five winning teams out of 26 in a University Hackathon for developing an innovative AI-powered web application.</li>
-          </ul>
-        </motion.section>
-        <motion.section id="achievements" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Achievements</h2>
-          <div className="achievement-content">
-            <ul>
-              <li>Recognized as one of five winning teams out of 26 in a University Hackathon for developing a machine learning-based solution that improved process automation and user engagement.</li>
-            </ul>
-            <motion.img 
-              src={hackathonImg} 
-              alt="Hackathon Achievement" 
-              className="achievement-img"
-              initial={{ opacity: 0, scale: 0.8 }} 
-              whileInView={{ opacity: 1, scale: 1 }} 
-              transition={{ duration: 0.8 }}
-              onClick={() => setShowModal(true)}
-              style={{ cursor: 'pointer' }}
-            />
+          </motion.article>
+        </section>
+
+        <motion.section className="about-section section-wrap section-block" id="about" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }} variants={reveal} transition={{ duration: 0.55 }}>
+          <div className="about-copy">
+            <p className="eyebrow">How I work</p><h2>I bridge product engineering and applied machine learning.</h2>
+            <p>My background spans user-facing React applications, Node.js services, cloud deployment and machine-learning research. I care about making systems understandable, reproducible and useful—not just technically impressive.</p>
+            <div className="education-card"><FaGraduationCap aria-hidden="true" /><div>
+              <p className="eyebrow">University of North Texas</p><h3>MS in Artificial Intelligence</h3>
+              <p>August 2024 — December 2026 (expected)</p>
+              <small>Deep Learning · Advanced Machine Learning · Computer Vision · Analysis of Algorithms</small>
+            </div></div>
           </div>
-          {showModal && (
-            <motion.div className="modal-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <motion.div className="modal-content" initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-                <button className="modal-close" onClick={() => setShowModal(false)}>&times;</button>
-                <img src={hackathonImg} alt="Hackathon Preview" className="modal-img" />
-              </motion.div>
-            </motion.div>
-          )}
+          <div className="capabilities" aria-label="Technical capabilities">
+            {capabilities.map((capability, index) => <motion.article key={capability.title} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }} variants={reveal} transition={{ duration: 0.45, delay: index * 0.08 }}>
+              <div className="capability-title">{capability.icon}<h3>{capability.title}</h3></div><p>{capability.items.join(' · ')}</p>
+            </motion.article>)}
+          </div>
         </motion.section>
-        <motion.section id="contact" variants={sectionVariants} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-          <h2>Contact</h2>
-          <p>Email: <a href="mailto:vinayakraju01@gmail.com">vinayakraju01@gmail.com</a></p>
-          <p>LinkedIn: <a href="https://www.linkedin.com/in/vinayak-raju/" target="_blank" rel="noopener noreferrer">vinayak-raju</a></p>
-          <p>GitHub: <a href="https://github.com/vinayakraju16" target="_blank" rel="noopener noreferrer">vinayakraju16</a></p>
+
+        <motion.section className="contact-section section-wrap" id="contact" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.4 }} variants={reveal} transition={{ duration: 0.55 }}>
+          <p className="eyebrow">Let&apos;s build something useful</p><h2>Looking for a full-stack or AI/ML engineer?</h2>
+          <p>I&apos;m currently pursuing full-time opportunities where I can contribute across software engineering and applied AI.</p>
+          <div className="contact-actions">
+            <a className="button button-light" href="mailto:rajuvinayak06@gmail.com"><FaEnvelope /> Email me</a>
+            <a className="contact-detail" href="tel:+19406296186"><FaPhoneAlt /> (940) 629-6186</a>
+          </div>
         </motion.section>
       </main>
+
+      <footer className="site-footer">
+        <p>© {new Date().getFullYear()} Siddhivinayak Raghavraju</p>
+        <div><a href="https://www.linkedin.com/in/vinayak-raju/" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com/vinayakraju16" target="_blank" rel="noreferrer">GitHub</a><a href="/Siddhivinayak-Raghavraju-Resume.pdf" target="_blank" rel="noreferrer">Résumé</a></div>
+      </footer>
     </div>
   );
 }
+
+export default App;
